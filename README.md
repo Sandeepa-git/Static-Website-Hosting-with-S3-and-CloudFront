@@ -1,5 +1,7 @@
 # Scalable & Secure Static Website Hosting on AWS (S3 + CloudFront OAC)
 
+![1794596018105](image/README/1794596018105.jpg)
+
 [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?logo=amazon-web-services&logoColor=white)](https://aws.amazon.com/)
 [![Amazon S3](<https://img.shields.io/badge/Amazon%20S3-Private%20Bucket-569A31?logo=amazons3&logoColor=white>)](https://aws.amazon.com/s3/)
 [![CloudFront](<https://img.shields.io/badge/Amazon%20CloudFront-OAC%20Enabled-8C4FFF?logo=amazon-aws&logoColor=white>)](https://aws.amazon.com/cloudfront/)
