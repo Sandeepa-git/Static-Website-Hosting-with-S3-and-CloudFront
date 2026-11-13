@@ -1,15 +1,15 @@
 # Scalable & Secure Static Website Hosting on AWS (S3 + CloudFront OAC)
 
-![1794596018105](image/README/1794596018105.jpg)
+![System Architecture](image/README/1794596018105.jpg)
 
 [![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?logo=amazon-web-services&logoColor=white)](https://aws.amazon.com/)
-[![Amazon S3](<https://img.shields.io/badge/Amazon%20S3-Private%20Bucket-569A31?logo=amazons3&logoColor=white>)](https://aws.amazon.com/s3/)
-[![CloudFront](<https://img.shields.io/badge/Amazon%20CloudFront-OAC%20Enabled-8C4FFF?logo=amazon-aws&logoColor=white>)](https://aws.amazon.com/cloudfront/)
-[![AWS WAF](<https://img.shields.io/badge/AWS%20WAF-Active-D86613?logo=amazon-aws&logoColor=white>)](https://aws.amazon.com/waf/)
-[![Security](<https://img.shields.io/badge/Security-Origin%20Access%20Control%20(SigV4)-green>)](https://aws.amazon.com/blogs/networking-and-content-delivery/amazon-cloudfront-introduces-origin-access-control-oac/)
+[![Amazon S3](https://img.shields.io/badge/Amazon%20S3-Private%20Bucket-569A31?logo=amazons3&logoColor=white)](https://aws.amazon.com/s3/)
+[![CloudFront](https://img.shields.io/badge/Amazon%20CloudFront-OAC%20Enabled-8C4FFF?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/cloudfront/)
+[![AWS WAF](https://img.shields.io/badge/AWS%20WAF-Active-D86613?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/waf/)
+[![Security](https://img.shields.io/badge/Security-Origin%20Access%20Control%20(SigV4)-green)](https://aws.amazon.com/blogs/networking-and-content-delivery/amazon-cloudfront-introduces-origin-access-control-oac/)
 [![HTTPS](https://img.shields.io/badge/SSL%2FTLS-Enforced-blue)](https://aws.amazon.com/)
 
-An enterprise-ready static website hosting architecture built on **Amazon Web Services (AWS)**. This solution serves **RegPro** (a multi-page business registration platform) globally with single-digit millisecond latency, high availability, and ironclad cloud security.
+An enterprise-ready static website hosting architecture built on **Amazon Web Services (AWS)**. This solution serves **RegPro** (a multi-page business registration platform) globally with single-digit millisecond latency, high availability, and ironclad cloud security. 
 
 Instead of traditional public S3 website hosting, this implementation leverages **CloudFront Origin Access Control (OAC)** with **SigV4 signing**, ensuring the S3 origin bucket remains **100% private** and protected against direct internet exposure.
 
@@ -50,7 +50,6 @@ The architecture decouples content storage from global content delivery:
 ```
 
 ### Key Architectural Strengths:
-
 1. **Zero Direct S3 Exposure:** The S3 bucket has **Block all public access** enabled. No user or external web crawler can bypass CloudFront to query S3 directly.
 2. **Modern OAC vs Legacy OAI:** Origin Access Control (OAC) implements AWS Signature Version 4 (SigV4) for robust request verification, SSE-KMS support, and dynamic security posture across all AWS regions.
 3. **Global Edge Acceleration:** Assets are cached at hundreds of CloudFront Points of Presence (PoPs) worldwide, ensuring lightning-fast load times.
@@ -68,8 +67,6 @@ Static-Website-Hosting-S3-CloudFront/
 │   └── styles.css                # Fully responsive design stylesheets
 ├── js/
 │   └── main.js                   # Client-side form handling and validation
-├── deploy-website.sh             # Bash automation script for AWS CLI deployment
-├── cleanup-website.sh            # Automated resource decommissioning script
 ├── Screenshots/                  # Console proofs and verification records
 │   ├── 1.png                     # Step 1: S3 Bucket creation parameters
 │   ├── 2.png                     # Step 2: S3 Bucket created in console
@@ -82,6 +79,9 @@ Static-Website-Hosting-S3-CloudFront/
 │   ├── 9.png                     # Step 9: S3 Bucket Policy with OAC condition
 │   ├── 10.png                    # Step 10: S3 Block Public Access enabled
 │   └── 11.png                    # Step 11: Production site live on HTTPS
+├── image/
+│   └── README/
+│       └── 1794596018105.jpg     # System Architecture Diagram
 └── README.md                     # Comprehensive project documentation
 ```
 
@@ -90,7 +90,6 @@ Static-Website-Hosting-S3-CloudFront/
 ## 🛠️ Step-by-Step Implementation Guide
 
 ### Step 1: Create the Amazon S3 Storage Bucket
-
 1. Open the **Amazon S3 Console** in the target region (`Europe (Stockholm) eu-north-1`).
 2. Create a bucket named `sandeepa-regpro-website-2026`.
 3. Set **Bucket type** to **General purpose**.
@@ -103,7 +102,6 @@ Static-Website-Hosting-S3-CloudFront/
 ---
 
 ### Step 2: Upload Website Assets
-
 1. Navigate into the `sandeepa-regpro-website-2026` bucket.
 2. Upload the website core files: `index.html` and `contact.html`.
 3. Upload directory trees: `css/` (containing `styles.css`) and `js/` (containing `main.js`).
@@ -115,7 +113,6 @@ Static-Website-Hosting-S3-CloudFront/
 ---
 
 ### Step 3: Configure CloudFront Origin Access Control (OAC)
-
 1. Open the **CloudFront Console** and navigate to **Security** → **Origin access**.
 2. Click **Create control setting**.
 3. Set **Name** to `regpro-website-oac`.
@@ -127,12 +124,11 @@ Static-Website-Hosting-S3-CloudFront/
 ---
 
 ### Step 4: Create & Configure CloudFront Distribution
-
 1. Navigate to **CloudFront** → **Distributions** → **Create distribution**.
 2. **Origin Configuration:**
    * Select the S3 REST domain: `sandeepa-regpro-website-2026.s3.eu-north-1.amazonaws.com`.
    * Under **Origin access**, select **Origin access control settings** and pick `regpro-website-oac`.
-   * *(Crucial: Do not use S3 static website endpoints with OAC).*
+   * *(Note: Do not use S3 static website endpoints with OAC).*
 3. **Default Cache Behavior:**
    * **Viewer protocol policy:** `Redirect HTTP to HTTPS`.
    * **Allowed HTTP methods:** `GET, HEAD`.
@@ -151,7 +147,6 @@ Static-Website-Hosting-S3-CloudFront/
 ---
 
 ### Step 5: Lock Down S3 Bucket Policy with OAC
-
 To permit CloudFront to read from our private S3 bucket without opening it to the public, apply an IAM bucket policy with an explicit condition checking the distribution ARN:
 
 1. In S3, open `sandeepa-regpro-website-2026` → **Permissions** → **Bucket policy**.
@@ -187,7 +182,6 @@ To permit CloudFront to read from our private S3 bucket without opening it to th
 ---
 
 ### Step 6: Production Verification & Testing
-
 Verify that all assets and pages resolve properly via the CloudFront domain:
 
 * **Homepage:** `https://d1frun5ugmhz7e.cloudfront.net/`
@@ -199,14 +193,12 @@ Verify that all assets and pages resolve properly via the CloudFront domain:
 
 ---
 
-## ⚡ Additional Production Steps (No Screenshots Required)
+## ⚡ Additional Cloud Steps (No Screenshots Required)
 
-The following advanced steps represent standard enterprise procedures for custom domains, certificate lifecycle, CI/CD, and teardown. *(Screenshots are omitted as permitted for staging environments).*
+The following advanced steps represent standard cloud procedures for custom domains, certificate lifecycle, cache invalidation, and resource cleanup. *(Screenshots are omitted as permitted for staging environments).*
 
 ### Step 7: Custom Domain Integration with Amazon Route 53
-
 To map a branded domain (e.g., `regpro.yourdomain.com`) to CloudFront:
-
 1. Open **Amazon Route 53** and navigate to your **Hosted Zone**.
 2. Click **Create Record**:
    * **Record Name:** `@` (apex) or `www`.
@@ -219,9 +211,7 @@ To map a branded domain (e.g., `regpro.yourdomain.com`) to CloudFront:
 ---
 
 ### Step 8: SSL/TLS Certificate Provisioning with AWS Certificate Manager (ACM)
-
 To serve your custom domain over HTTPS without browser warnings:
-
 1. Open **AWS Certificate Manager (ACM)** in **US East (N. Virginia) `us-east-1`** *(CloudFront requires custom certificates in `us-east-1`)*.
 2. Select **Request a certificate** → **Request a public certificate**.
 3. Specify domain names: `yourdomain.com` and `*.yourdomain.com`.
@@ -234,101 +224,50 @@ To serve your custom domain over HTTPS without browser warnings:
 
 ---
 
-### Step 9: CloudFront Cache Invalidation & Continuous Updates
+### Step 9: CloudFront Cache Invalidation & Edge Cache Refresh
+When website assets or HTML pages are updated in the S3 bucket, invalidate the edge cache so visitors receive the newest version immediately:
 
-When website content is updated, push the new files to S3 and invalidate the edge cache so users receive the latest changes immediately:
-
-```bash
-# 1. Sync updated files to S3 (excluding non-production files)
-aws s3 sync . s3://sandeepa-regpro-website-2026 \
-  --exclude "*.sh" \
-  --exclude "*.md" \
-  --exclude ".git/*" \
-  --exclude "Screenshots/*"
-
-# 2. Invalidate CloudFront edge cache globally
-aws cloudfront create-invalidation \
-  --distribution-id E2N274ZOEWOET2 \
-  --paths "/*"
-```
-
----
-
-### Step 10: Automated CI/CD Pipeline (GitHub Actions Blueprint)
-
-You can automate deployments using GitHub Actions on git push:
-
-```yaml
-name: Deploy Static Website to AWS
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
-
-      - name: Sync Files to Amazon S3
-        run: |
-          aws s3 sync . s3://sandeepa-regpro-website-2026 \
-            --delete \
-            --exclude ".git/*" \
-            --exclude "Screenshots/*" \
-            --exclude "*.md" \
-            --exclude "*.sh"
-
-      - name: Invalidate CloudFront Distribution Cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
-```
-
----
-
-### Step 11: Teardown & Resource Decommissioning
-
-To clean up all AWS resources and prevent recurring charges:
-
-1. Run the included automation script:
+1. Open **CloudFront Console** → Select distribution `E2N274ZOEWOET2`.
+2. Go to the **Invalidations** tab and click **Create invalidation**.
+3. Enter `/*` as the object path to clear all cached edge content.
+4. Or perform invalidation via AWS CLI:
    ```bash
-   chmod +x cleanup-website.sh
-   ./cleanup-website.sh
+   aws cloudfront create-invalidation \
+     --distribution-id E2N274ZOEWOET2 \
+     --paths "/*"
    ```
-2. Or perform manual teardown in the AWS Console:
-   * Disable CloudFront distribution `E2N274ZOEWOET2` and delete it after deployment status clears.
-   * Empty S3 bucket `sandeepa-regpro-website-2026` and delete the bucket.
-   * Delete Route 53 alias records and ACM certificate if created.
+
+---
+
+### Step 10: Teardown & Resource Decommissioning
+To clean up AWS resources when the website is no longer needed:
+1. **Disable CloudFront Distribution:**
+   * Open the CloudFront Console, select distribution `E2N274ZOEWOET2`, and click **Disable**.
+   * Wait for deployment to complete, then click **Delete**.
+2. **Empty & Delete S3 Bucket:**
+   * Open the Amazon S3 Console, select `sandeepa-regpro-website-2026`, and click **Empty**.
+   * Confirm deletion of all objects, then delete the bucket.
+3. **Cleanup Route 53 & ACM (if configured):**
+   * Delete DNS alias records from the hosted zone.
+   * Delete the ACM public certificate from `us-east-1`.
 
 ---
 
 ## 🔒 Security & Best Practices Comparison
 
-| Feature                       | Traditional S3 Website                            | Enterprise S3 + CloudFront (This Project)           |
-| :---------------------------- | :------------------------------------------------ | :-------------------------------------------------- |
-| **S3 Public Access**    | Requires Public Access = Disabled (Security Risk) | **Block All Public Access = ENABLED**         |
-| **Data Encryption**     | Plain HTTP unless using proxy                     | **Enforced HTTPS (TLS 1.2/1.3)**              |
-| **Access Verification** | Open to any IP on internet                        | **SigV4 / SigV4a Signed Requests only**       |
-| **DDoS & Web Shield**   | Basic AWS Shield Standard                         | **Integrated AWS WAF + Edge Shielding**       |
-| **Global Latency**      | High (tied to single S3 region)                   | **Ultra-low (200+ edge locations worldwide)** |
-| **Cost Profile**        | Pay per S3 GET requests                           | **Lower cost via edge caching optimization**  |
+| Feature | Traditional S3 Website | Enterprise S3 + CloudFront (This Project) |
+| :--- | :--- | :--- |
+| **S3 Public Access** | Requires Public Access = Disabled (Security Risk) | **Block All Public Access = ENABLED** |
+| **Data Encryption** | Plain HTTP unless using proxy | **Enforced HTTPS (TLS 1.2/1.3)** |
+| **Access Verification** | Open to any IP on internet | **SigV4 / SigV4a Signed Requests only** |
+| **DDoS & Web Shield** | Basic AWS Shield Standard | **Integrated AWS WAF + Edge Shielding** |
+| **Global Latency** | High (tied to single S3 region) | **Ultra-low (200+ edge locations worldwide)** |
+| **Cost Profile** | Pay per S3 GET requests | **Lower cost via edge caching optimization** |
 
 ---
 
 ## 💡 Key Learnings & Skills Demonstrated
-
-* Cloud Architecture Design using modern decoupled micro-services.
+* Cloud Architecture Design using modern decoupled cloud services.
 * Enterprise Identity & Access Management (IAM) and resource-based S3 policies with conditional clauses (`AWS:SourceArn`).
 * AWS CDN deployment, caching behaviors, and origin shielding.
 * Cloud security compliance ensuring zero data leaks from object storage.
@@ -337,7 +276,6 @@ To clean up all AWS resources and prevent recurring charges:
 ---
 
 ## 👤 Author
-
-**Sandeepa***AWS Cloud & DevOps Engineering Enthusiast*
-
+**Sandeepa**  
+*AWS Cloud & Architecture Enthusiast*  
 * [GitHub Profile](https://github.com/) • [LinkedIn](https://linkedin.com/)
